@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name        Nacion.com un poco menos peor.
-// @namespace   http://no.nacion.com/
-// @version     0.4
-// @description paywall, costa rica, nacion.com, la nacion, nacion
+// @namespace   https://github.com/leopic/tampermonkey
+// @version     0.5
+// @description paywall, costa rica, nacion.com, la nacion, nacion, financiero, nazion
 // @match       http://www.nacion.com/
 // @match       http://www.nacion.com/*/*
 // @match       http://www.nacion.com/**
@@ -10,11 +10,10 @@
 // @copyright  2014+, Leo Picado
 // ==/UserScript==
 
-// http://stackoverflow.com/questions/524696/how-to-create-a-style-tag-with-javascript
 (function() {
     var css = '',
         elToHide = ['.md-wgt-twitter', '.gna-corp-onsite-bar', '.ob_org_header', '.md-fxrate .source', '.cp-tools.md.clr', '.onsite-bar', '#comentarios', '.social-links', '#nav-top', '.pg-bkn-trail-id', '.ob_what', '.md-breakingnews-wrapper', '.rg-ad', '.md-adn_radio', '*[id*="eplAdDiv"]', '*[id*="creative_"]', '*[id*="ns_ad"]', '#comments', '#footer', '#header .onsite-bar', '#LNA_background', '#LNA_contenidoTotal', '.LNA_background_paywall', '#header .masthead', '#paywall-notification', '#nacion-login-bar', '#LNA_paywall_modal', '.pg-aux #pageTools', '#heading #pageToolbar', '.gn_footer'],
-        fontsToFix = ['.sk-md2 .mt .lnk', '.md-news-editorial .kicker', '.md-news-editorial .headline, .md-news-editorial .headline .lnk', '.md-news-editorial .holder', '.mce-body em.mce, .mce-body em.mce .mce, .mce-body i.mce, .mce-body i.mce .mce', '.main-search .search-field', '.md-item-eco-currency-rates .item', '.md-scr-news .hed .kicker', '.md-scr-news .hed', '.md-print-edition .lst', '.showlist-item .hed', '.md-block-special .slice-caption', '.md-block-special .slice-brief', '.md-blogs .lst', '.nws .kicker', '.pane-jigsaw .mtx .kicker', '.pane-jigsaw .mtx .hed', '.md-topmost .lst .lnk', '.md .read-more .lnk', '.sk-md1 .hd .title', '.md-columnist-content-title', '.md-columnist-content-author', '.md-editorial .brief', '.md-editorial .bd', '.md-news-today .headline', '.cp-relations .rel-entry .rel', '.cp-reltags .tag', '.pg-story .pg-bkn-nutfold li, .pg-story .pg-bkn-nutfold p', '.mce-body b.mce, .mce-body b.mce .mce, .mce-body strong.mce, .mce-body strong.mce .mce', '.lst-relinfo', '.nws .brief', '.nws .dateline', '.nws .headline','.cp-relations .rel-entry', '.pg-story .pg-bkn-dateline','.md-news-latest .lst', '.dateline', '.md-news-topic .lst .lnk', '.mce-body .mce', '.mce-body p.mce', '.pg-story .pg-bkn-headline', '.footnote', '.md-news-topic .brief .lnk .dest', '.ob_org_header', '.AR_1 .strip-rec-link-title']
+        fontsToFix = ['.mce-body em.mce, .mce-body em.mce .mce, .mce-body i.mce, .mce-body i.mce .mce', '.main-search .search-field', '.md-item-eco-currency-rates .item', '.md-scr-news .hed .kicker', '.md-scr-news .hed', '.md-print-edition .lst', '.showlist-item .hed', '.md-block-special .slice-caption', '.md-block-special .slice-brief', '.md-blogs .lst', '.nws .kicker', '.pane-jigsaw .mtx .kicker', '.pane-jigsaw .mtx .hed', '.md-topmost .lst .lnk', '.md .read-more .lnk', '.sk-md1 .hd .title', '.md-columnist-content-title', '.md-columnist-content-author', '.md-editorial .brief', '.md-editorial .bd', '.md-news-today .headline', '.cp-relations .rel-entry .rel', '.cp-reltags .tag', '.pg-story .pg-bkn-nutfold li, .pg-story .pg-bkn-nutfold p', '.mce-body b.mce, .mce-body b.mce .mce, .mce-body strong.mce, .mce-body strong.mce .mce', '.lst-relinfo', '.nws .brief', '.nws .dateline', '.nws .headline','.cp-relations .rel-entry', '.pg-story .pg-bkn-dateline','.md-news-latest .lst', '.dateline', '.md-news-topic .lst .lnk', '.mce-body .mce', '.mce-body p.mce', '.pg-story .pg-bkn-headline', '.footnote', '.md-news-topic .brief .lnk .dest', '.ob_org_header', '.AR_1 .strip-rec-link-title']
     
     css += elToHide.join(',') + '{ display: none!important; }';
     css += fontsToFix.join(',') + '{font-family: sans-serif; font-weight: 400;}';
@@ -32,6 +31,7 @@
         head = document.head || document.getElementsByTagName('head')[0],
         style = document.createElement('style');
 
+    // http://stackoverflow.com/questions/524696/how-to-create-a-style-tag-with-javascript
     style.type = 'text/css';
     if (style.styleSheet) {
         style.styleSheet.cssText = css;
@@ -41,6 +41,7 @@
 
     head.appendChild(style);
 
+    // Removiendo paywalls
     var checkAndRemoveElem = function(id, interval) {
         var modal = document.getElementById(id);
 
@@ -49,10 +50,10 @@
             clearInterval(interval);
         }
     };
+    var unPayWall = setInterval(checkAndRemoveElem, 5, 'LNA_paywall_modal', unPayWall),
+        dosPayWall = setInterval(checkAndRemoveElem, 5, 'paywall-cookie', dosPayWall),
+        tresPayWall = setInterval(checkAndRemoveElem, 5, 'conteo_notas_paywall', tresPayWall);
 
-    var firstPayWall = setInterval(checkAndRemoveElem, 5, 'LNA_paywall_modal', firstPayWall);
-    var secondPayWall = setInterval(checkAndRemoveElem, 5, 'paywall-cookie', secondPayWall);
-    
     // Cookies
     // http://stackoverflow.com/questions/2144386/javascript-delete-cookie
     function createCookie(name,value,days) {
@@ -65,26 +66,18 @@
         document.cookie = name+"="+value+expires+"; path=/";
     }
 
-    function readCookie(name) {
-        var nameEQ = name + "=";
-        var ca = document.cookie.split(';');
-        for(var i=0;i < ca.length;i++) {
-            var c = ca[i];
-            while (c.charAt(0)==' ') c = c.substring(1,c.length);
-            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length,c.length);
-        }
-        return null;
-    }
-    
-    // Add link back to home
-    $('<li class="nav-item main thm1 nav-item-first"><a class="nav-item-inner lnk" href="/" style="min-width:60px;"><span class="tx">Home</span></a></li>').prependTo('.nav-holder .nav-item:first-child');
-    $('nav-item main.thm1.nav-item-first').removeClass('nav-item-first');
-
     function eraseCookie(name) {
         createCookie(name,"",-1);
     }
-    
-    eraseCookie('xp-allowed');
-    eraseCookie('xp-pagesCount');
-    
+
+    var allCookies = document.cookie.split(';');
+    for (var j = 0; j < allCookies.length; j++) {
+        var name = allCookies[j].split('=');
+        eraseCookie(name);
+    }
+
+    // Add link back to home
+    $('<li class="nav-item main thm1 nav-item-first"><a class="nav-item-inner lnk" href="/"><span class="tx">Home</span></a></li>').prependTo('.nav-holder .nav-item:first-child');
+    $('nav-item main.thm1.nav-item-first').removeClass('nav-item-first');
+
 })();
