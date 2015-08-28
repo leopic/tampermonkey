@@ -66,18 +66,37 @@
         document.cookie = name+"="+value+expires+"; path=/";
     }
 
+    function readCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0;i < ca.length;i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1,c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        }
+        return null;
+    }
+
     function eraseCookie(name) {
         createCookie(name,"",-1);
+        console.log('erasedCookie %s', name);
     }
 
+    // El nombre del cookie es un hash, entonces en vez de adivinarlo,
+    // recorremos los cookies hasta encontrar el correcto.
     var allCookies = document.cookie.split(';');
     for (var j = 0; j < allCookies.length; j++) {
-        var name = allCookies[j].split('=');
-        eraseCookie(name);
+        var name = allCookies[j].split('=')[0].trim(),
+            value = readCookie(name);
+
+        try {
+            value = decodeURIComponent(value.replace(/\+/g,  " "));
+            value = JSON.parse(value);
+            value['lw-allowed'] && eraseCookie(name);
+            value['gnpw-allowed'] && eraseCookie(name);
+        } catch (e) {}
     }
 
-    // Add link back to home
-    $('<li class="nav-item main thm1 nav-item-first"><a class="nav-item-inner lnk" href="/"><span class="tx">Home</span></a></li>').prependTo('.nav-holder .nav-item:first-child');
-    $('nav-item main.thm1.nav-item-first').removeClass('nav-item-first');
+    eraseCookie('lanacion_session_id');
 
 })();
